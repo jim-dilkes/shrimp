@@ -30,7 +30,6 @@ public class GameScreen extends ScreenAdapter {
 	static final int GAME_OVER = 4;
 
 	Shrimp game;
-
 	OrthographicCamera guiCam;
 	Vector3 touchPoint;
 	World world;
@@ -138,24 +137,30 @@ public class GameScreen extends ScreenAdapter {
 			guiCam.unproject(touchPoint.set(Gdx.input.getX(), Gdx.input.getY(), 0));
 			touchPoint.set(Gdx.input.getX(), Gdx.input.getY(), 0);
 			//Touch commands (pause button etc.)
-			System.out.println("Init touch: x = " +touchPoint.x +", y = " + touchPoint.y);
+			System.out.println("Init touch: x = " +touchPoint.x +", y = " + touchPoint.y + ", mid x = " + Assets.w/2);
 		}
-		
+
 		ApplicationType appType = Gdx.app.getType();
 		
 		// should work also with Gdx.input.isPeripheralAvailable(Peripheral.Accelerometer)
 		float rot = 0.0f, forceF=0.0f;
 		
 		if (appType == ApplicationType.Android || appType == ApplicationType.iOS) {
-			//if (toucpoint.x>) rot = -0.035f;
-			//if (Gdx.input.isKeyPressed(Keys.A)) rot = 0.035f;
+			if(Gdx.input.isTouched()) {
+				guiCam.unproject(touchPoint.set(Gdx.input.getX(), Gdx.input.getY(), 0));
+				touchPoint.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+				if (touchPoint.x > Assets.w / 2) rot = -0.035f;
+				else if (touchPoint.x < Assets.w / 2) rot = 0.035f;
+			}
+			forceF=25000;
+
 		} else {
-			if (Gdx.input.isKeyPressed(Keys.D)) rot = -0.035f;
-			if (Gdx.input.isKeyPressed(Keys.A)) rot = 0.035f;
+			//if (Gdx.input.isKeyPressed(Keys.D)) rot = -0.035f;
+			//if (Gdx.input.isKeyPressed(Keys.A)) rot = 0.035f;
 			if (Gdx.input.isKeyPressed(Keys.W)) forceF = 30000f;
 			if (Gdx.input.isKeyPressed(Keys.S)) forceF = -8000f;
 		}
-		
+		touchPoint.setZero();
 		engine.getSystem(VehicleSystem.class).setRot(rot);
 		engine.getSystem(VehicleSystem.class).setForceF(forceF);
 		
